@@ -1,0 +1,23 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r, message=FALSE}
+library(tidyverse)
+library(edgeR)
+
+names <- read_delim('info.csv', delim = ';') %>% select('GEO ID (GSE89843)', "Patient group")
+
+samples <- read_delim('GSE89843_TEP_Count_Matrix.txt.gz', delim = ' ')
+samples_nsclc <- samples[colnames(samples) %in% names$`GEO ID (GSE89843)`]
+
+
+norm_factors <- calcNormFactors(samples_nsclc, method = 'TMM')
+normalized_samples_nsclc <- samples_nsclc * norm_factors
+rownames(normalized_samples_nsclc) <- samples$`Gene ID`
+
+write.csv(normalized_samples_nsclc, 'normalized_samples_nsclc.csv', sep = ',')
+
+```
